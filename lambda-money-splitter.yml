@@ -1,0 +1,9 @@
+provider:
+  name: faas
+  gateway: http://localhost:8080
+
+functions:
+  lambda-money-splitter:
+    lang: node
+    handler: ./lambda-money-splitter
+    image: lambda-money-splitter
