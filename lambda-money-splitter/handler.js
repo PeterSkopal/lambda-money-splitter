@@ -1,7 +1,7 @@
 "use strict"
 
 exports.handler = (event, context, callback) => {
-    const data = event.data;
+    const data = JSON.parse(event.body).data;
     const sum_reducer = (accumulator, currentValue) => accumulator + currentValue;
     let total_expenses = 0;
     data.people.forEach(person => {
@@ -46,5 +46,15 @@ exports.handler = (event, context, callback) => {
             
         }
     });
-    callback(undefined, {transactions: transactions});
+
+    var response = {
+        "statusCode": 200,
+        "headers": {
+            "my_header": "my_value"
+        },
+        "body": JSON.stringify(transactions),
+        "isBase64Encoded": false
+    };
+
+    callback(undefined, response);
 }
