@@ -10,7 +10,7 @@ exports.handler = (event, context, callback) => {
         }
     });
 
-    var money_adjustments = {};
+    var money_adjustments = {}; // if negative, person owes money
     const split_amount = total_expenses / data.people.length;
 
     data.people.forEach(p => {
@@ -23,29 +23,32 @@ exports.handler = (event, context, callback) => {
     });
 
     var transactions = [];
-
-    data.people.forEach(p => {
-        if (money_adjustments[p.name] > 0) {
+    var i = 0;
+    while (i < data.people.length) {
+        const current_person = data.people[i];
+        if (money_adjustments[current_person.name] < 0) {
             var maximum_debt = 0;
-            var person_paying = '';
+            var pay_to = '';
             data.people.forEach(p1 => {
-                if (maximum_debt > money_adjustments[p1.name]) {
-                    person_paying = p1.name;
+                if (maximum_debt < money_adjustments[p1.name]) {
+                    pay_to = p1.name;
                     maximum_debt = money_adjustments[p1.name];
                 }
             });
 
-            var diff = money_adjustments[p.name];
-            money_adjustments[person_paying] += diff;
-            money_adjustments[p.name] -= diff;
+            var diff = Math.abs(money_adjustments[pay_to]);
+            money_adjustments[pay_to] -= diff;
+            money_adjustments[current_person.name] += diff;
             transactions.push({
-                from : person_paying,
-                to : p.name,
+                from : current_person.name,
+                to : pay_to,
                 amount : diff
             });
-            
+        } else {
+            i++;
         }
-    });
+        
+    }
 
     var response = {
         "statusCode": 200,
