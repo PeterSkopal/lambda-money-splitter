@@ -4,6 +4,7 @@ exports.handler = (event, context, callback) => {
     try {
         const data = JSON.parse(event.body).data;
         const sum_reducer = (accumulator, currentValue) => accumulator + currentValue;
+        const round = (value) => Math.round(value * 100) / 100;
         let total_expenses = 0;
         data.people.forEach(person => {
             if (person.expenses.length > 0) {
@@ -12,18 +13,18 @@ exports.handler = (event, context, callback) => {
         });
 
         var money_adjustments = {}; // if negative, person owes money
-        const split_amount = total_expenses / data.people.length;
+        const split_amount = round(total_expenses / data.people.length);
 
         data.people.forEach(p => {
             if (p.expenses.length > 0) {
                 var sum = p.expenses.reduce(sum_reducer);
-                money_adjustments[p.name] = sum - split_amount;
+                money_adjustments[p.name] = round(sum - split_amount);
             } else {
-                money_adjustments[p.name] = -split_amount;
+                money_adjustments[p.name] = round(-split_amount);
             }
         });
 
-        var transactions = [];
+        var transactions = { amount: split_amount };
         var i = 0;
         while (i < data.people.length) {
             const current_person = data.people[i];
@@ -37,11 +38,13 @@ exports.handler = (event, context, callback) => {
                     }
                 });
 
-                var diff = Math.abs(money_adjustments[pay_to]);
-                money_adjustments[pay_to] -= diff;
-                money_adjustments[current_person.name] += diff;
-                transactions.push({
-                    from : current_person.name,
+                var diff = money_adjustments[pay_to] > split_amount ? split_amount : Math.abs(money_adjustments[pay_to]);
+                money_adjustments[pay_to] = round(money_adjustments[pay_to] - diff);
+                money_adjustments[current_person.name] = round(money_adjustments[current_person.name] + diff);
+                if (transactions[current_person.name] === undefined) {
+                    transactions[current_person.name] = [];
+                }
+                transactions[current_person.name].push({
                     to : pay_to,
                     amount : diff
                 });
