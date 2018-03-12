@@ -29,6 +29,6 @@ function callback(err, res) {
     if (err) {
         console.error(err);
     } else {
-        console.log(JSON.parse(res.body));
+        console.log("\nResponse:\n", JSON.parse(res.body));
     }
 }
