@@ -3,8 +3,19 @@
 exports.handler = (event, context, callback) => {
     try {
         const data = JSON.parse(event.body).data;
-        const sum_reducer = (accumulator, currentValue) => accumulator + currentValue;
-        const round = (value) => Math.round(value * 100) / 100;
+        if (!data || !data.people) {
+            throw 'Incorrect request body.'
+        }
+        data.people.forEach(person => {
+            if (!person.name || !person.expenses)
+                throw 'Incorrect request body.'
+        });
+        const sum_reducer = (accumulator, currentValue) => {
+            if (currentValue <= 0)
+                throw 'All expenses must be positive numbers.';
+            return accumulator + currentValue;
+        };
+        const round = (value) => Math.round(value * 10000) / 10000;
         let total_expenses = 0;
         data.people.forEach(person => {
             if (person.expenses.length > 0) {
@@ -53,16 +64,21 @@ exports.handler = (event, context, callback) => {
             }
             
         }
+
+        var response = {
+            'statusCode': 200,
+            'body': JSON.stringify(transactions),
+            'isBase64Encoded': false
+        };
+        callback(undefined, response);
     } catch (err) {
-        console.error(err);
-        callback(err, undefined);
+        var error_response = {
+            'statusCode': 200,
+            'body': JSON.stringify({message: err}),
+            'isBase64Encoded': false
+        }
+        callback(error_response, undefined);
     }
 
-    var response = {
-        "statusCode": 200,
-        "body": JSON.stringify(transactions),
-        "isBase64Encoded": false
-    };
 
-    callback(undefined, response);
 }
