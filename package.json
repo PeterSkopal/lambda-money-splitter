@@ -11,5 +11,9 @@
   "license": "ISC",
   "dependencies": {
     "jest": "^22.4.2"
+  },
+  "jest": {
+    "coverageDirectory": "./coverage/",
+    "collectCoverage": true
   }
 }
