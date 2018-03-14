@@ -1,7 +1,7 @@
 language: node_js
 node_js:
   - "6"
-matrix:
-  include:
-    script:
-      - npm run test
+script:
+  - npm run test
+after_success:
+  - codecov
