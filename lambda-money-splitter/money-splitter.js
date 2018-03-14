@@ -3,7 +3,7 @@
 exports.handler = (event, context, callback) => {
     try {
         const data = JSON.parse(event.body).data;
-        if (!data || !data.people) {
+        if (!data || !data.people || data.people.length === 0) {
             throw 'Incorrect request body.'
         }
         data.people.forEach(person => {
@@ -15,7 +15,7 @@ exports.handler = (event, context, callback) => {
                 throw 'All expenses must be positive numbers.';
             return accumulator + currentValue;
         };
-        const round = (value) => Math.round(value * 10000) / 10000;
+        const round = (value) => Math.round(value * 100) / 100;
         let total_expenses = 0;
         data.people.forEach(person => {
             if (person.expenses.length > 0) {
@@ -39,7 +39,7 @@ exports.handler = (event, context, callback) => {
         var i = 0;
         while (i < data.people.length) {
             const current_person = data.people[i];
-            if (money_adjustments[current_person.name] < 0) {
+            if (Math.round(money_adjustments[current_person.name]) < 0) {
                 var maximum_debt = 0;
                 var pay_to = '';
                 data.people.forEach(p1 => {

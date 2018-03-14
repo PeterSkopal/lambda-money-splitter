@@ -1,0 +1,12 @@
+{
+  "name": "lambda-money-splitter",
+  "version": "1.0.0",
+  "description": "",
+  "main": "lambda-money-splitter/handler.js",
+  "scripts": {
+    "test": "jest"
+  },
+  "keywords": [],
+  "author": "Peter Skopal",
+  "license": "ISC"
+}
